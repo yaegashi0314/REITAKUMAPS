@@ -1,0 +1,60 @@
+/* ページ全体 */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: sans-serif;
+}
+
+/* ヘッダー */
+header {
+    background: #6a00d4;
+    color: white;
+    padding: 12px 15px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+/* コンパスボタン */
+#compassButton {
+    background: white;
+    color: #6a00d4;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 8px 12px;
+
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#compassButton:active {
+    opacity: 0.8;
+}
+
+/* 地図 */
+#map {
+    width: 100%;
+    height: calc(100vh - 58px);
+}
+
+/* MapLibreのポップアップ */
+.maplibregl-popup {
+    max-width: 200px;
+}
+
+.maplibregl-popup-content {
+    font-size: 15px;
+    text-align: center;
+    border-radius: 10px;
+    padding: 10px;
+}
