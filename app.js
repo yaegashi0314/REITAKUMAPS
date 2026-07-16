@@ -78,9 +78,11 @@ const plants = [
 // 地図を作成
 map = new maplibregl.Map({
     container: "map",
-    style: "https://demotiles.maplibre.org/style.json",
+    style: "https://api.maptiler.com/maps/streets-v2/style.json?key=8eMo5VJPTs3GM9Axz6Dn",
     center: [139.95603, 35.83444],
-    zoom: 18
+    zoom: 18,
+    pitch: 45,
+    bearing: 0
 });
 
 // ナビゲーションボタン
