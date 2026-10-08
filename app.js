@@ -1,3 +1,8 @@
+// ==================================================
+// REITAKUMAPS
+// app.js
+// ==================================================
+
 let map;
 let currentMarker = null;
 let currentLocation = null;
@@ -30,6 +35,7 @@ const plants = [
     { lat: 35.833194, lng: 139.955167, name: "にれ" },
     { lat: 35.833361, lng: 139.955056, name: "百合" },
     { lat: 35.833556, lng: 139.955083, name: "かしのき" },
+
     { lat: 35.834667, lng: 139.955972, name: "サルスベリ" },
     { lat: 35.834528, lng: 139.955194, name: "イレックス・カシネ" },
     { lat: 35.834361, lng: 139.95525, name: "トウネズミモチ" },
@@ -37,9 +43,11 @@ const plants = [
     { lat: 35.834222, lng: 139.955444, name: "ヨーロッパイチイ" },
     { lat: 35.834306, lng: 139.955583, name: "モミジ" },
     { lat: 35.834472, lng: 139.956, name: "百合" },
+
     { lat: 35.833111, lng: 139.956528, name: "せいようし" },
     { lat: 35.833528, lng: 139.956611, name: "けやき" },
     { lat: 35.833639, lng: 139.956556, name: "ゆちゃ" },
+
     { lat: 35.834306, lng: 139.955472, name: "けやき" },
     { lat: 35.83425, lng: 139.955306, name: "けやき" },
     { lat: 35.834194, lng: 139.955333, name: "下野か" },
@@ -55,6 +63,7 @@ const plants = [
     { lat: 35.833972, lng: 139.955444, name: "サルスベリ" },
     { lat: 35.834028, lng: 139.955472, name: "ケヤキ" },
     { lat: 35.833972, lng: 139.9555, name: "フイリケヤキ" },
+
     { lat: 35.834694, lng: 139.955194, name: "はなみずき" },
     { lat: 35.834667, lng: 139.955222, name: "ベンジャミン" },
     { lat: 35.834694, lng: 139.955222, name: "もちのき" },
@@ -84,13 +93,49 @@ const plants = [
 // 地図
 // ==================================================
 
+// MapTilerは使用しない
+// 国土地理院の航空写真だけを表示する
+
 map = new maplibregl.Map({
 
     container: "map",
 
-    // MapTilerの地図をベースに使用
-    style:
-        "https://api.maptiler.com/maps/hybrid-v4/style.json?key=8eMo5VJPTs3GM9Axz6Dn",
+    style: {
+        version: 8,
+
+        sources: {
+
+            "gsi-photo": {
+
+                type: "raster",
+
+                tiles: [
+                    "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
+                ],
+
+                tileSize: 256,
+
+                attribution: "国土地理院"
+            }
+
+        },
+
+        layers: [
+
+            {
+                id: "gsi-photo-layer",
+
+                type: "raster",
+
+                source: "gsi-photo",
+
+                paint: {
+                    "raster-opacity": 1
+                }
+            }
+
+        ]
+    },
 
     center: [
         139.95603,
@@ -99,13 +144,18 @@ map = new maplibregl.Map({
 
     zoom: 18,
 
-    pitch: 45,
+    pitch: 0,
 
-    bearing: 0
+    bearing: 0,
+
+    attributionControl: true
 });
 
 
+// ==================================================
 // ナビゲーション
+// ==================================================
+
 map.addControl(
     new maplibregl.NavigationControl(),
     "top-right"
@@ -113,41 +163,14 @@ map.addControl(
 
 
 // ==================================================
-// 国土地理院 最新航空写真
+// 地図読み込み完了
 // ==================================================
 
 map.on("load", () => {
 
-    map.addSource("gsi-photo", {
-
-        type: "raster",
-
-        tiles: [
-            "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg"
-        ],
-
-        tileSize: 256,
-
-        attribution:
-            "国土地理院"
-    });
-
-
-    map.addLayer({
-
-        id: "gsi-photo-layer",
-
-        type: "raster",
-
-        source: "gsi-photo",
-
-        paint: {
-
-            "raster-opacity": 1
-
-        }
-
-    });
+    console.log(
+        "REITAKUMAPS: 地図読み込み完了"
+    );
 
 });
 
@@ -164,7 +187,6 @@ function createCurrentLocationMarker(
     const markerElement =
         document.createElement("div");
 
-
     markerElement.style.width =
         "50px";
 
@@ -180,18 +202,18 @@ function createCurrentLocationMarker(
     markerElement.style.justifyContent =
         "center";
 
+    markerElement.style.pointerEvents =
+        "none";
+
 
     const arrowImage =
         document.createElement("img");
 
-
     arrowImage.src =
-        "arrow.png";
-
+        "./arrow.png";
 
     arrowImage.alt =
         "現在地";
-
 
     arrowImage.style.width =
         "50px";
@@ -337,34 +359,35 @@ if ("geolocation" in navigator) {
 
 plants.forEach((plant) => {
 
-    new maplibregl.Marker({
+    const marker =
+        new maplibregl.Marker({
 
-        color: "green"
-
-    })
-
-    .setLngLat([
-
-        plant.lng,
-        plant.lat
-
-    ])
-
-    .setPopup(
-
-        new maplibregl.Popup({
-
-            offset: 25
+            color: "#168a3b"
 
         })
 
-        .setText(
-            plant.name
+        .setLngLat([
+
+            plant.lng,
+            plant.lat
+
+        ])
+
+        .setPopup(
+
+            new maplibregl.Popup({
+
+                offset: 25
+
+            })
+
+            .setText(
+                plant.name
+            )
+
         )
 
-    )
-
-    .addTo(map);
+        .addTo(map);
 
 });
 
@@ -386,7 +409,6 @@ class LocationControl {
                 "div"
             );
 
-
         container.className =
             "maplibregl-ctrl maplibregl-ctrl-group";
 
@@ -396,14 +418,11 @@ class LocationControl {
                 "button"
             );
 
-
         button.type =
             "button";
 
-
         button.title =
             "現在地へ戻る";
-
 
         button.setAttribute(
             "aria-label",
@@ -422,8 +441,8 @@ class LocationControl {
             ">
 
                 <span style="
-                    width:14px;
-                    height:14px;
+                    width:16px;
+                    height:16px;
                     border:3px solid #007AFF;
                     border-radius:50%;
                     position:relative;
@@ -432,8 +451,8 @@ class LocationControl {
 
                     <span style="
                         position:absolute;
-                        width:5px;
-                        height:5px;
+                        width:6px;
+                        height:6px;
                         background:#007AFF;
                         border-radius:50%;
                         left:50%;
@@ -459,7 +478,6 @@ class LocationControl {
                     );
 
                     return;
-
                 }
 
 
@@ -504,9 +522,9 @@ class LocationControl {
                 this._container
             );
 
+
         this._map =
             undefined;
-
     }
 
 }
@@ -534,7 +552,9 @@ const compassButton =
 if (compassButton) {
 
     compassButton.addEventListener(
+
         "click",
+
         async () => {
 
             // iPhone
@@ -596,6 +616,7 @@ if (compassButton) {
             }
 
         }
+
     );
 
 }
@@ -658,6 +679,7 @@ function handleOrientation(event) {
 
     }
 
+
     // Android
     else if (
 
@@ -686,7 +708,7 @@ function handleOrientation(event) {
         (heading + 360) % 360;
 
 
-    // 矢印が逆だったため180度反転
+    // 矢印画像の向きを調整
     heading =
         heading + 180;
 
@@ -750,7 +772,7 @@ const closeIosHint =
 
 
 // ==================================================
-// Chromeなどのインストールイベント
+// Chrome / Edgeなど
 // ==================================================
 
 window.addEventListener(
@@ -795,15 +817,7 @@ if (installButton) {
 
         async () => {
 
-            console.log(
-                "インストールボタンが押されました"
-            );
-
-
-            // --------------------------------
             // PWAとしてインストール可能
-            // --------------------------------
-
             if (deferredInstallPrompt) {
 
                 deferredInstallPrompt.prompt();
@@ -836,10 +850,7 @@ if (installButton) {
             }
 
 
-            // --------------------------------
             // インストールイベントがない場合
-            // --------------------------------
-
             alert(
 
                 "このブラウザでは今すぐインストール画面を開けません。\n\n" +
@@ -950,6 +961,52 @@ if (closeIosHint) {
                     true;
 
             }
+
+        }
+
+    );
+
+}
+
+
+// ==================================================
+// Service Worker登録
+// ==================================================
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+
+        "load",
+
+        () => {
+
+            navigator.serviceWorker
+                .register(
+                    "./service-worker.js"
+                )
+
+                .then(
+                    (registration) => {
+
+                        console.log(
+                            "Service Worker registered:",
+                            registration.scope
+                        );
+
+                    }
+                )
+
+                .catch(
+                    (error) => {
+
+                        console.error(
+                            "Service Worker registration failed:",
+                            error
+                        );
+
+                    }
+                );
 
         }
 
