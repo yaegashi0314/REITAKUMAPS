@@ -1,9 +1,6 @@
 let map;
 let currentMarker;
 
-// コンパスの現在の向き
-let currentHeading = 0;
-
 // ================================
 // 植物データ
 // ================================
@@ -111,7 +108,6 @@ map.addControl(
 
 function createCurrentLocationMarker(lng, lat) {
 
-    // 矢印用のHTML要素
     const markerElement = document.createElement("div");
 
     markerElement.style.width = "55px";
@@ -133,29 +129,33 @@ function createCurrentLocationMarker(lng, lat) {
 
     arrowImage.style.objectFit = "contain";
 
-    // 矢印の中心を基準に回転
-    arrowImage.style.transformOrigin = "center center";
+    arrowImage.style.display = "block";
 
-    // 回転を滑らかにする
+    arrowImage.style.transformOrigin =
+        "center center";
+
     arrowImage.style.transition =
         "transform 0.15s linear";
 
-    markerElement.appendChild(arrowImage);
+    markerElement.appendChild(
+        arrowImage
+    );
 
-    // MapLibreのマーカーを作成
     currentMarker = new maplibregl.Marker({
         element: markerElement,
+
         anchor: "center"
     })
         .setLngLat([lng, lat])
         .addTo(map);
 
-    // 後からコンパスで回転させるため保存
-    currentMarker._arrowElement = arrowImage;
+    // コンパスから操作するため保存
+    currentMarker._arrowElement =
+        arrowImage;
 }
 
 // ================================
-// 現在地を取得
+// 現在地取得
 // ================================
 
 if ("geolocation" in navigator) {
@@ -170,7 +170,10 @@ if ("geolocation" in navigator) {
             const lat =
                 position.coords.latitude;
 
-            // 初回
+            // ============================
+            // 現在地マーカー作成
+            // ============================
+
             if (!currentMarker) {
 
                 createCurrentLocationMarker(
@@ -180,7 +183,10 @@ if ("geolocation" in navigator) {
 
             }
 
-            // 2回目以降は位置だけ更新
+            // ============================
+            // 現在地を更新
+            // ============================
+
             else {
 
                 currentMarker.setLngLat([
@@ -189,6 +195,23 @@ if ("geolocation" in navigator) {
                 ]);
 
             }
+
+            // ============================
+            // 自分を画面中央にする
+            // ============================
+
+            map.easeTo({
+
+                center: [
+                    lng,
+                    lat
+                ],
+
+                duration: 500,
+
+                essential: true
+
+            });
 
         },
 
@@ -209,6 +232,7 @@ if ("geolocation" in navigator) {
             timeout: 10000
         }
     );
+
 }
 
 // ================================
@@ -242,21 +266,25 @@ plants.forEach((plant) => {
 // コンパスボタン
 // ================================
 
-document
-    .getElementById("compassButton")
-    .addEventListener(
+const compassButton =
+    document.getElementById(
+        "compassButton"
+    );
+
+if (compassButton) {
+
+    compassButton.addEventListener(
         "click",
         async () => {
 
-            /*
-             * iPhone / iPad
-             *
-             * センサー使用許可が必要
-             */
+            // ========================
+            // iPhone / iPad
+            // ========================
 
             if (
                 typeof DeviceOrientationEvent !==
                     "undefined" &&
+
                 typeof DeviceOrientationEvent
                     .requestPermission ===
                     "function"
@@ -294,9 +322,9 @@ document
 
             }
 
-            /*
-             * Androidなど
-             */
+            // ========================
+            // Androidなど
+            // ========================
 
             else {
 
@@ -306,6 +334,7 @@ document
 
         }
     );
+}
 
 // ================================
 // コンパス開始
@@ -319,15 +348,14 @@ function startCompass() {
         true
     );
 
-    const button =
-        document.getElementById(
-            "compassButton"
-        );
+    if (compassButton) {
 
-    button.textContent =
-        "コンパス有効中";
+        compassButton.textContent =
+            "コンパス有効中";
 
-    button.disabled = true;
+        compassButton.disabled =
+            true;
+    }
 }
 
 // ================================
@@ -338,19 +366,14 @@ function handleOrientation(event) {
 
     let heading = null;
 
-    /*
-     * iPhone / iPad
-     *
-     * webkitCompassHeading
-     * 北 = 0度
-     * 東 = 90度
-     * 南 = 180度
-     * 西 = 270度
-     */
+    // ================================
+    // iPhone / iPad
+    // ================================
 
     if (
         event.webkitCompassHeading !==
             undefined &&
+
         event.webkitCompassHeading !==
             null
     ) {
@@ -360,12 +383,13 @@ function handleOrientation(event) {
 
     }
 
-    /*
-     * Androidなど
-     */
+    // ================================
+    // Androidなど
+    // ================================
 
     else if (
         event.alpha !== null &&
+
         event.alpha !== undefined
     ) {
 
@@ -374,16 +398,16 @@ function handleOrientation(event) {
 
     }
 
-    // 方位が取得できない場合
+    // 方位が取れない場合
     if (heading === null) {
+
         return;
+
     }
 
     // 0～360度にする
     heading =
         (heading + 360) % 360;
-
-    currentHeading = heading;
 
     // ================================
     // arrow.pngを回転
@@ -391,6 +415,7 @@ function handleOrientation(event) {
 
     if (
         currentMarker &&
+
         currentMarker._arrowElement
     ) {
 
@@ -398,12 +423,11 @@ function handleOrientation(event) {
             ._arrowElement
             .style.transform =
                 `rotate(${heading}deg)`;
-
     }
 }
 
 // ================================
-// PWA インストール
+// PWA
 // ================================
 
 let deferredInstallPrompt = null;
@@ -452,7 +476,6 @@ window.addEventListener(
                 false;
 
         }
-
     }
 );
 
@@ -466,9 +489,7 @@ if (installButton) {
         "click",
         async () => {
 
-            if (
-                !deferredInstallPrompt
-            ) {
+            if (!deferredInstallPrompt) {
 
                 return;
 
@@ -519,16 +540,18 @@ const isStandalone =
     window.matchMedia(
         "(display-mode: standalone)"
     ).matches ||
+
     window.navigator.standalone === true;
 
-// iPhoneなら案内を表示
+// iPhoneの場合
 if (
     isIOS &&
     !isStandalone &&
     iosHint
 ) {
 
-    iosHint.hidden = false;
+    iosHint.hidden =
+        false;
 
 }
 
@@ -542,7 +565,8 @@ if (closeIosHint) {
         "click",
         () => {
 
-            iosHint.hidden = true;
+            iosHint.hidden =
+                true;
 
         }
     );
