@@ -3,20 +3,39 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>木麗マップ</title>
 
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <meta name="theme-color" content="#6a00d4">
+    <meta name="description" content="麗澤大学の木を探せるREITAKUMAPS">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="REITAKUMAPS">
+
+    <title>REITAKUMAPS</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 
     <!-- MapLibre -->
-    <link href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css" rel="stylesheet">
+    <link
+        href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css"
+        rel="stylesheet">
+
     <script src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"></script>
 </head>
 
 <body>
 
     <header>
-        <h1>木麗マップ</h1>
+        <h1>REITAKUMAPS</h1>
 
         <button id="compassButton">
             コンパスを有効化
@@ -25,7 +44,62 @@
 
     <div id="map"></div>
 
+    <!-- PWAインストール -->
+    <div id="installBanner" class="install-banner" hidden>
+
+        <div>
+            <strong>REITAKUMAPSをアプリとして使う</strong>
+            <small>ホーム画面に追加できます</small>
+        </div>
+
+        <button id="installButton">
+            インストール
+        </button>
+
+        <button id="closeInstallButton">
+            ×
+        </button>
+
+    </div>
+
+    <!-- iPhone用 -->
+    <div id="iosHint" class="ios-hint" hidden>
+
+        iPhoneでは「共有」→「ホーム画面に追加」で
+        アプリとして使えます。
+
+        <button id="closeIosHint">
+            閉じる
+        </button>
+
+    </div>
+
     <script src="app.js"></script>
+
+    <!-- Service Worker -->
+    <script>
+
+        if ("serviceWorker" in navigator) {
+
+            window.addEventListener("load", () => {
+
+                navigator.serviceWorker
+                    .register("./service-worker.js")
+                    .then(() => {
+                        console.log("Service Worker registered");
+                    })
+                    .catch(error => {
+                        console.error(
+                            "Service Worker registration failed:",
+                            error
+                        );
+                    });
+
+            });
+
+        }
+
+    </script>
 
 </body>
 
