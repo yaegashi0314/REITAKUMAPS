@@ -1,146 +1,78 @@
+
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
+    <meta name="theme-color" content="#6a00d4">
+    <meta name="description" content="麗澤大学の木を探せるマップアプリ">
 
-    <!-- PWA -->
-    <meta
-        name="theme-color"
-        content="#6a00d4"
-    >
-
-    <meta
-        name="description"
-        content="麗澤大学の木を探せるマップアプリ"
-    >
-
-    <meta
-        name="mobile-web-app-capable"
-        content="yes"
-    >
-
-    <meta
-        name="apple-mobile-web-app-capable"
-        content="yes"
-    >
-
-    <meta
-        name="apple-mobile-web-app-status-bar-style"
-        content="default"
-    >
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
     <title>REITAKUMAPS</title>
 
+    <!-- PWA設定 -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-    <!-- PWA manifest -->
-
-    <link
-        rel="manifest"
-        href="./manifest.json"
-    >
-
-
-    <!-- iPhone用アイコン -->
-
-    <link
-        rel="apple-touch-icon"
-        href="./icons/icon-192.png"
-    >
-
-
-    <!-- MapLibre CSS -->
-
+    <!-- MapLibre -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css"
     >
 
+    <link rel="stylesheet" href="./style.css">
 
-    <!-- 自分のCSS -->
-
-    <link
-        rel="stylesheet"
-        href="./style.css"
-    >
-
-
-    <!-- MapLibre JS -->
-
-    <script
-        src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"
-    ></script>
-
+    <script src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"></script>
 </head>
 
-
 <body>
-
-
-    <!-- ======================================== -->
     <!-- ヘッダー -->
-    <!-- ======================================== -->
-
     <header>
+        <h1>REITAKUMAPS</h1>
 
-        <h1>
-            REITAKUMAPS
-        </h1>
-
-
-        <button
-            id="compassButton"
-            type="button"
-        >
+        <button id="compassButton" type="button">
             コンパスを有効化
         </button>
-
     </header>
 
-
-    <!-- ======================================== -->
-    <!-- マップ -->
-    <!-- ======================================== -->
-
-    <div id="map"></div>
-
-
-    <!-- ======================================== -->
-    <!-- アプリインストール案内 -->
-    <!-- ======================================== -->
-
-    <div
-        id="installBanner"
-        class="install-banner"
-        hidden
-    >
-
-        <div>
-
-            <strong>
-                REITAKUMAPSをアプリとして使う
-            </strong>
-
-            <small>
-                ホーム画面に追加できます
-            </small>
-
-        </div>
-
-
+    <!-- 地図切り替え -->
+    <nav id="mapModeBar" aria-label="地図の種類">
         <button
-            id="installButton"
+            id="photoModeButton"
+            class="map-mode-button active"
             type="button"
+            aria-pressed="true"
         >
-            インストール
+            航空写真
         </button>
 
+        <button
+            id="normalModeButton"
+            class="map-mode-button"
+            type="button"
+            aria-pressed="false"
+        >
+            通常地図
+        </button>
+    </nav>
+
+    <!-- 地図本体 -->
+    <main id="map"></main>
+
+    <!-- アプリインストール案内 -->
+    <div id="installBanner" class="install-banner" hidden>
+        <div class="install-banner-text">
+            <strong>REITAKUMAPSをアプリとして使う</strong>
+            <small>ホーム画面に追加できます</small>
+        </div>
+
+        <button id="installButton" type="button">
+            インストール
+        </button>
 
         <button
             id="closeInstallButton"
@@ -149,95 +81,45 @@
         >
             ×
         </button>
-
     </div>
 
-
-    <!-- ======================================== -->
     <!-- iPhone用案内 -->
-    <!-- ======================================== -->
-
-    <div
-        id="iosHint"
-        class="ios-hint"
-        hidden
-    >
-
-        <strong>
-            REITAKUMAPSをアプリに追加
-        </strong>
+    <div id="iosHint" class="ios-hint" hidden>
+        <strong>REITAKUMAPSをアプリに追加</strong>
 
         <p>
-            iPhoneでは「共有」→
-            「ホーム画面に追加」で
+            iPhoneでは「共有」→「ホーム画面に追加」で
             アプリとして使えます。
         </p>
 
-
-        <button
-            id="closeIosHint"
-            type="button"
-        >
+        <button id="closeIosHint" type="button">
             閉じる
         </button>
-
     </div>
 
-
-    <!-- ======================================== -->
     <!-- アプリ本体 -->
-    <!-- ======================================== -->
+    <script src="./app.js"></script>
 
-    <script
-        src="./app.js"
-    ></script>
-
-
-    <!-- ======================================== -->
-    <!-- Service Worker -->
-    <!-- ======================================== -->
-
+    <!-- Service Worker登録 -->
     <script>
-
         if ("serviceWorker" in navigator) {
-
-            window.addEventListener(
-                "load",
-                () => {
-
-                    navigator.serviceWorker
-                        .register("./service-worker.js")
-
-                        .then(
-                            (registration) => {
-
-                                console.log(
-                                    "Service Worker registered:",
-                                    registration.scope
-                                );
-
-                            }
-                        )
-
-                        .catch(
-                            (error) => {
-
-                                console.error(
-                                    "Service Worker registration failed:",
-                                    error
-                                );
-
-                            }
+            window.addEventListener("load", () => {
+                navigator.serviceWorker
+                    .register("./service-worker.js")
+                    .then((registration) => {
+                        console.log(
+                            "Service Worker registered:",
+                            registration.scope
                         );
-
-                }
-            );
-
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "Service Worker registration failed:",
+                            error
+                        );
+                    });
+            });
         }
-
     </script>
-
-
 </body>
-
 </html>

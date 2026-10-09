@@ -1,31 +1,32 @@
+
 {
+    "id": "./",
     "name": "REITAKUMAPS",
     "short_name": "REITAKUMAPS",
-    "description": "麗澤大学の木を探せるマップアプリ",
-
+    "description": "麗澤大学の木の位置を確認できるキャンパスマップ",
     "start_url": "./",
     "scope": "./",
-
     "display": "standalone",
     "orientation": "any",
-
     "background_color": "#ffffff",
     "theme_color": "#6a00d4",
-
     "lang": "ja",
-
+    "categories": [
+        "education",
+        "navigation"
+    ],
     "icons": [
         {
             "src": "./icons/icon-192.png",
             "sizes": "192x192",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "./icons/icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         }
     ]
 }

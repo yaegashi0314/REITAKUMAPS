@@ -1,11 +1,7 @@
-/* ========================================
-   REITAKUMAPS style.css
-   ======================================== */
 
-
-/* ========================================
+/* =========================
    基本設定
-   ======================================== */
+========================= */
 
 * {
     box-sizing: border-box;
@@ -13,12 +9,10 @@
 
 html,
 body {
-    margin: 0;
-    padding: 0;
-
     width: 100%;
     height: 100%;
-
+    margin: 0;
+    padding: 0;
     overflow: hidden;
 
     font-family:
@@ -28,595 +22,492 @@ body {
         "Noto Sans JP",
         sans-serif;
 
-    background: #ffffff;
+    background: #f5f5f5;
+    color: #222;
 }
 
+button {
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+}
 
-/* ========================================
+/* =========================
    ヘッダー
-   ======================================== */
+========================= */
 
 header {
     position: relative;
-
-    width: 100%;
-
-    height: 74px;
-
-    padding:
-        0
-        16px
-        0
-        20px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    background: #6a00d4;
-
-    color: white;
-
     z-index: 1000;
 
-    box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    width: 100%;
+    height: 58px;
+    padding: 0 15px;
+
+    background: #6a00d4;
+    color: #fff;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
-
-
-/* タイトル */
 
 header h1 {
     margin: 0;
 
-    font-size: 30px;
-
+    font-size: 22px;
     font-weight: 700;
-
     letter-spacing: 0.5px;
 
     white-space: nowrap;
 }
 
-
-/* ========================================
-   コンパスボタン
-   ======================================== */
+/* コンパスボタン */
 
 #compassButton {
-    min-width: 170px;
+    flex-shrink: 0;
 
-    height: 48px;
-
-    padding: 0 18px;
+    min-height: 38px;
+    padding: 9px 13px;
 
     border: none;
+    border-radius: 10px;
 
-    border-radius: 12px;
-
-    background: white;
-
+    background: #fff;
     color: #6a00d4;
 
-    font-size: 16px;
-
+    font-size: 14px;
     font-weight: 600;
 
-    cursor: pointer;
-
-    box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 
     transition:
-        transform 0.15s ease,
-        opacity 0.15s ease;
+        transform 0.1s ease,
+        opacity 0.1s ease;
 }
-
 
 #compassButton:active {
     transform: scale(0.96);
-
     opacity: 0.8;
 }
 
+/* =========================
+   地図モード切り替え
+========================= */
 
-/* コンパス有効時 */
+#mapModeBar {
+    position: absolute;
+    z-index: 1100;
 
-#compassButton.active {
-    background: #ffffff;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
 
-    color: #5b00b5;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    padding: 5px;
+
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
 }
 
+.map-mode-button {
+    min-height: 38px;
+    padding: 9px 17px;
 
-/* ========================================
-   マップ
-   ======================================== */
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+    color: #444;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.map-mode-button.active {
+    background: #6a00d4;
+    color: #fff;
+}
+
+.map-mode-button:active {
+    opacity: 0.75;
+}
+
+/* =========================
+   地図
+========================= */
 
 #map {
-    position: relative;
+    position: absolute;
+
+    top: 58px;
+    left: 0;
+    right: 0;
+    bottom: 0;
 
     width: 100%;
-
-    height: calc(100vh - 74px);
-
-    height: calc(100dvh - 74px);
-
-    background: #e5e5e5;
+    height: calc(100% - 58px);
 }
-
-
-/* MapLibre */
 
 .maplibregl-map {
-    width: 100%;
-
-    height: 100%;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 }
 
+/* 地図の操作ボタン */
 
-/* ========================================
-   MapLibre ナビゲーション
-   ======================================== */
+.maplibregl-ctrl-top-right {
+    top: 55px;
+    right: 10px;
+}
 
 .maplibregl-ctrl-group {
-    border-radius: 10px !important;
-
     overflow: hidden;
 
-    box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.2) !important;
-}
+    border-radius: 9px !important;
 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
 
 .maplibregl-ctrl-group button {
-    width: 42px !important;
-
-    height: 42px !important;
+    width: 34px;
+    height: 34px;
 }
 
+.maplibregl-ctrl-bottom-right {
+    right: 8px;
+    bottom: 8px;
+}
 
-/* ========================================
-   ポップアップ
-   ======================================== */
+.maplibregl-ctrl-bottom-left {
+    left: 8px;
+    bottom: 8px;
+}
+
+/* 地図のポップアップ */
 
 .maplibregl-popup {
     max-width: 240px;
 }
 
-
 .maplibregl-popup-content {
-    padding: 12px 15px;
+    padding: 11px 14px;
 
-    border-radius: 12px;
+    border-radius: 10px;
 
     font-size: 15px;
-
     font-weight: 500;
-
     text-align: center;
 
-    box-shadow:
-        0 3px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
 }
 
-
-/* ========================================
-   植物マーカー
-   ======================================== */
-
-.plant-marker {
-    cursor: pointer;
-}
-
-
-/* ========================================
+/* =========================
    現在地マーカー
-   ======================================== */
+========================= */
 
 .current-location-marker {
-    width: 46px;
-
-    height: 46px;
+    width: 42px;
+    height: 42px;
 
     background-image: url("./arrow.png");
-
     background-size: contain;
-
+    background-repeat: no-repeat;
     background-position: center;
 
-    background-repeat: no-repeat;
-
     transform-origin: center center;
-
     pointer-events: none;
-
-    filter:
-        drop-shadow(
-            0 2px 3px
-            rgba(0, 0, 0, 0.35)
-        );
 }
 
-
-/* ========================================
-   現在地へ戻るボタン
-   ======================================== */
-
-#locationButton {
-    position: absolute;
-
-    right: 18px;
-
-    bottom: 24px;
-
-    width: 54px;
-
-    height: 54px;
-
-    border: none;
-
-    border-radius: 50%;
-
-    background: white;
-
-    color: #333;
-
-    font-size: 25px;
-
-    cursor: pointer;
-
-    z-index: 900;
-
-    box-shadow:
-        0 3px 12px rgba(0, 0, 0, 0.25);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    transition:
-        transform 0.15s ease,
-        background 0.15s ease;
-}
-
-
-#locationButton:active {
-    transform: scale(0.92);
-
-    background: #f0f0f0;
-}
-
-
-/* ========================================
-   PWA インストール案内
-   ======================================== */
+/* =========================
+   アプリインストール案内
+========================= */
 
 .install-banner {
     position: fixed;
+    z-index: 3000;
 
-    left: 20px;
-
-    right: 20px;
-
+    left: 16px;
+    right: 16px;
     bottom: 20px;
 
-    z-index: 5000;
-
     display: flex;
-
     align-items: center;
+    gap: 10px;
 
-    gap: 12px;
+    min-height: 82px;
+    padding: 15px 12px 15px 18px;
 
-    padding: 18px;
-
-    background: white;
-
+    background: #fff;
     border-radius: 20px;
 
-    box-shadow:
-        0 5px 30px
-        rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 }
 
+.install-banner[hidden],
+.ios-hint[hidden] {
+    display: none !important;
+}
 
-/* インストール案内の文字 */
-
-.install-banner > div {
+.install-banner-text {
     flex: 1;
-
     min-width: 0;
 }
-
 
 .install-banner strong {
     display: block;
 
-    margin-bottom: 5px;
-
-    font-size: 17px;
-
     color: #222;
+    font-size: 16px;
+    line-height: 1.4;
 }
-
 
 .install-banner small {
     display: block;
-
-    font-size: 14px;
+    margin-top: 4px;
 
     color: #777;
+    font-size: 13px;
+    line-height: 1.4;
 }
-
-
-/* インストールボタン */
 
 #installButton {
+    flex-shrink: 0;
+
+    padding: 11px 16px;
+
     border: none;
-
-    border-radius: 12px;
-
-    padding: 12px 18px;
+    border-radius: 10px;
 
     background: #6a00d4;
+    color: #fff;
 
-    color: white;
-
-    font-size: 15px;
-
+    font-size: 14px;
     font-weight: 600;
-
-    cursor: pointer;
-
-    white-space: nowrap;
 }
-
 
 #installButton:active {
-    opacity: 0.8;
-
-    transform: scale(0.96);
+    opacity: 0.75;
+    transform: scale(0.97);
 }
-
-
-/* 閉じるボタン */
 
 #closeInstallButton {
-    width: 42px;
+    flex-shrink: 0;
 
-    height: 42px;
+    width: 38px;
+    height: 38px;
 
     border: none;
+    border-radius: 10px;
 
-    border-radius: 12px;
+    background: #eee;
+    color: #6a00d4;
 
-    background: #eeeeee;
-
-    color: #777;
-
-    font-size: 25px;
-
-    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
 }
 
-
-#closeInstallButton:active {
-    background: #dddddd;
-}
-
-
-/* ========================================
-   iPhone用インストール案内
-   ======================================== */
+/* =========================
+   iPhone用案内
+========================= */
 
 .ios-hint {
     position: fixed;
+    z-index: 3000;
 
-    left: 20px;
-
-    right: 20px;
-
+    left: 16px;
+    right: 16px;
     bottom: 20px;
-
-    z-index: 5000;
 
     padding: 20px;
 
-    background: white;
-
+    background: #fff;
     border-radius: 20px;
 
-    box-shadow:
-        0 5px 30px
-        rgba(0, 0, 0, 0.25);
-}
-
-
-.ios-hint strong {
-    display: block;
-
-    margin-bottom: 10px;
-
-    font-size: 19px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 
     color: #222;
 }
 
+.ios-hint strong {
+    display: block;
+    margin-bottom: 8px;
+
+    font-size: 18px;
+}
 
 .ios-hint p {
     margin: 0 0 15px;
 
-    font-size: 15px;
-
+    color: #666;
+    font-size: 14px;
     line-height: 1.6;
-
-    color: #555;
 }
-
 
 #closeIosHint {
     width: 100%;
-
-    height: 44px;
+    padding: 11px;
 
     border: none;
-
     border-radius: 10px;
 
     background: #6a00d4;
-
-    color: white;
+    color: #fff;
 
     font-size: 15px;
-
     font-weight: 600;
 }
 
+/* =========================
+   PC表示
+========================= */
 
-/* ========================================
-   hidden
-   ======================================== */
-
-[hidden] {
-    display: none !important;
-}
-
-
-/* ========================================
-   スマートフォン
-   ======================================== */
-
-@media (max-width: 600px) {
-
+@media (min-width: 768px) {
     header {
-        height: 72px;
-
-        padding:
-            0
-            10px
-            0
-            16px;
+        height: 64px;
+        padding: 0 22px;
     }
-
 
     header h1 {
         font-size: 25px;
     }
 
-
     #compassButton {
-        min-width: 135px;
-
-        height: 44px;
-
-        padding: 0 12px;
-
-        font-size: 14px;
-
-        border-radius: 11px;
-    }
-
-
-    #map {
-        height: calc(100vh - 72px);
-
-        height: calc(100dvh - 72px);
-    }
-
-
-    .maplibregl-ctrl-top-right {
-        top: 12px;
-
-        right: 10px;
-    }
-
-
-    .maplibregl-ctrl-group button {
-        width: 42px !important;
-
-        height: 42px !important;
-    }
-
-
-    .install-banner {
-        left: 14px;
-
-        right: 14px;
-
-        bottom: 14px;
-
-        padding: 15px;
-
-        border-radius: 18px;
-
-        gap: 8px;
-    }
-
-
-    .install-banner strong {
+        padding: 10px 16px;
         font-size: 15px;
     }
 
+    #map {
+        top: 64px;
+        height: calc(100% - 64px);
+    }
 
-    .install-banner small {
+    #mapModeBar {
+        top: 76px;
+    }
+
+    .map-mode-button {
+        padding: 10px 20px;
+        font-size: 15px;
+    }
+
+    .maplibregl-ctrl-top-right {
+        top: 55px;
+    }
+
+    .install-banner {
+        left: 50%;
+        right: auto;
+        width: calc(100% - 32px);
+        max-width: 520px;
+        transform: translateX(-50%);
+    }
+}
+
+/* =========================
+   小型スマートフォン
+========================= */
+
+@media (max-width: 380px) {
+    header {
+        padding: 0 10px;
+        gap: 6px;
+    }
+
+    header h1 {
+        font-size: 18px;
+        letter-spacing: 0;
+    }
+
+    #compassButton {
+        padding: 8px 9px;
         font-size: 12px;
     }
 
-
-    #installButton {
-        padding: 11px 14px;
-
-        font-size: 14px;
+    #mapModeBar {
+        gap: 2px;
+        padding: 4px;
     }
 
-
-    #closeInstallButton {
-        width: 38px;
-
-        height: 38px;
-
-        font-size: 22px;
+    .map-mode-button {
+        min-height: 36px;
+        padding: 8px 12px;
+        font-size: 12px;
     }
 
-
-    .ios-hint {
-        left: 14px;
-
-        right: 14px;
-
-        bottom: 14px;
-
-        padding: 18px;
+    .install-banner {
+        left: 10px;
+        right: 10px;
+        padding: 13px;
     }
 
-
-    .ios-hint strong {
-        font-size: 17px;
-    }
-
-}
-
-
-/* ========================================
-   小さいスマホ
-   ======================================== */
-
-@media (max-width: 380px) {
-
-    header h1 {
-        font-size: 22px;
-    }
-
-
-    #compassButton {
-        min-width: 120px;
-
+    .install-banner strong {
         font-size: 13px;
     }
 
+    .install-banner small {
+        font-size: 11px;
+    }
+
+    #installButton {
+        padding: 10px 11px;
+        font-size: 12px;
+    }
+}
+
+/* =========================
+   iPhoneのセーフエリア
+========================= */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+    .install-banner,
+    .ios-hint {
+        bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+}
+
+/* インストール済みアプリ */
+
+@media (display-mode: standalone) {
+    header {
+        padding-top: env(safe-area-inset-top);
+        height: calc(58px + env(safe-area-inset-top));
+    }
+
+    #map {
+        top: calc(58px + env(safe-area-inset-top));
+        height: calc(100% - 58px - env(safe-area-inset-top));
+    }
+
+    #mapModeBar {
+        top: calc(70px + env(safe-area-inset-top));
+    }
+
+    .install-banner {
+        display: none !important;
+    }
+}
+
+/* スクロールバー非表示 */
+
+::-webkit-scrollbar {
+    display: none;
 }
