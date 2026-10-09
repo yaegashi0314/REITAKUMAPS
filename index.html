@@ -2,123 +2,128 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <meta name="theme-color" content="#6a00d4">
-    <meta name="description" content="麗澤大学の木を探せるマップアプリ">
+  <title>REITAKUMAPS</title>
+  <meta
+    name="description"
+    content="麗澤大学の木の位置を確認できるキャンパスマップ"
+  >
+  <meta name="theme-color" content="#6a00d4">
 
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-    <title>REITAKUMAPS</title>
+  <!-- MapLibre -->
+  <link
+    href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css"
+    rel="stylesheet"
+  >
 
-    <!-- PWA設定 -->
-    <link rel="manifest" href="./manifest.json">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png">
-
-    <!-- MapLibre -->
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css"
-    >
-
-    <link rel="stylesheet" href="./style.css">
-
-    <script src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"></script>
+  <!-- アプリのCSS -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-    <!-- ヘッダー -->
-    <header>
-        <h1>REITAKUMAPS</h1>
+  <!-- ヘッダー -->
+  <header id="appHeader">
+    <div class="header-title">
+      <h1>REITAKUMAPS</h1>
+      <p>麗澤大学キャンパスマップ</p>
+    </div>
 
-        <button id="compassButton" type="button">
-            コンパスを有効化
-        </button>
-    </header>
+    <button
+      id="compassButton"
+      type="button"
+      aria-label="コンパスのオン・オフ"
+      aria-pressed="false"
+      title="コンパス"
+    >
+      <span aria-hidden="true">🧭</span>
+    </button>
+  </header>
 
-    <!-- 地図切り替え -->
-    <nav id="mapModeBar" aria-label="地図の種類">
-  <button
-    id="photoModeButton"
-    class="map-mode-button active"
-    type="button"
-    aria-pressed="true"
-  >
-    航空写真
-  </button>
+  <!-- 地図の種類切り替え -->
+  <nav id="mapModeBar" aria-label="地図の種類">
+    <button
+      id="photoModeButton"
+      class="map-mode-button active"
+      type="button"
+      aria-pressed="true"
+    >
+      航空写真
+    </button>
 
-  <button
-    id="normalModeButton"
-    class="map-mode-button"
-    type="button"
-    aria-pressed="false"
-  >
-    通常地図
-  </button>
-</nav>
-    <!-- 地図本体 -->
-    <main id="map"></main>
+    <button
+      id="normalModeButton"
+      class="map-mode-button"
+      type="button"
+      aria-pressed="false"
+    >
+      通常地図
+    </button>
+  </nav>
 
-    <!-- アプリインストール案内 -->
-    <div id="installBanner" class="install-banner" hidden>
-        <div class="install-banner-text">
-            <strong>REITAKUMAPSをアプリとして使う</strong>
-            <small>ホーム画面に追加できます</small>
-        </div>
+  <!-- 地図 -->
+  <main id="mapContainer">
+    <div
+      id="map"
+      role="application"
+      aria-label="麗澤大学のキャンパスマップ"
+    ></div>
+  </main>
 
+  <!-- アプリのインストール案内 -->
+  <section id="installBanner" hidden>
+    <div class="install-banner-content">
+      <div>
+        <strong>REITAKUMAPSをインストール</strong>
+        <p>ホーム画面からすぐに開けます。</p>
+      </div>
+
+      <div class="install-banner-actions">
         <button id="installButton" type="button">
-            インストール
+          インストール
         </button>
 
         <button
-            id="closeInstallButton"
-            type="button"
-            aria-label="閉じる"
+          id="closeInstallButton"
+          type="button"
+          aria-label="インストール案内を閉じる"
         >
-            ×
+          閉じる
         </button>
+      </div>
     </div>
+  </section>
 
-    <!-- iPhone用案内 -->
-    <div id="iosHint" class="ios-hint" hidden>
-        <strong>REITAKUMAPSをアプリに追加</strong>
+  <!-- iPhone向けインストール案内 -->
+  <aside id="iosInstallHint" hidden>
+    iPhoneではSafariの共有メニューから
+    「ホーム画面に追加」を選択してください。
+    <button id="closeIosHintButton" type="button">
+      閉じる
+    </button>
+  </aside>
 
-        <p>
-            iPhoneでは「共有」→「ホーム画面に追加」で
-            アプリとして使えます。
-        </p>
+  <!-- MapLibre本体 -->
+  <script src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"></script>
 
-        <button id="closeIosHint" type="button">
-            閉じる
-        </button>
-    </div>
+  <!-- アプリの処理 -->
+  <script src="./app.js"></script>
 
-    <!-- アプリ本体 -->
-    <script src="./app.js"></script>
-
-    <!-- Service Worker登録 -->
-    <script>
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker
-                    .register("./service-worker.js")
-                    .then((registration) => {
-                        console.log(
-                            "Service Worker registered:",
-                            registration.scope
-                        );
-                    })
-                    .catch((error) => {
-                        console.error(
-                            "Service Worker registration failed:",
-                            error
-                        );
-                    });
-            });
-        }
-    </script>
+  <!-- PWAのService Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./service-worker.js")
+          .catch(function (error) {
+            console.error("Service Workerの登録に失敗しました:", error);
+          });
+      });
+    }
+  </script>
 </body>
 </html>
