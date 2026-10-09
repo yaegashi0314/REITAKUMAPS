@@ -511,3 +511,45 @@ header h1 {
 ::-webkit-scrollbar {
     display: none;
 }
+/* 地図切り替えボタン */
+#mapModeBar {
+    position: absolute;
+    top: 68px;
+    left: 10px;
+    z-index: 1000;
+
+    display: flex;
+    gap: 6px;
+
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.map-mode-button {
+    min-height: 40px;
+    padding: 8px 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+    color: #333;
+
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.map-mode-button.active {
+    background: #6a00d4;
+    border-color: #6a00d4;
+    color: white;
+}
+
+.map-mode-button:focus-visible {
+    outline: 2px solid #6a00d4;
+    outline-offset: 2px;
+}
