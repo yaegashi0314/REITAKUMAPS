@@ -162,6 +162,8 @@ function initializeMap() {
     attributionControl: true
   });
 
+  map.setMaxZoom(18);
+
   map.addControl(
     new maplibregl.NavigationControl(),
     "top-right"
