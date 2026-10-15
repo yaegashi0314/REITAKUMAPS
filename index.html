@@ -114,16 +114,27 @@
   <!-- アプリの処理 -->
   <script src="./app.js"></script>
 
+  
   <!-- PWAのService Worker -->
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
-        navigator.serviceWorker.register("./service-worker.js")
+        navigator.serviceWorker.register("./sw.js")
+          .then(function (registration) {
+            console.log(
+              "Service Worker登録成功:",
+              registration.scope
+            );
+          })
           .catch(function (error) {
-            console.error("Service Workerの登録に失敗しました:", error);
+            console.error(
+              "Service Workerの登録に失敗しました:",
+              error
+            );
           });
       });
     }
   </script>
+
 </body>
 </html>
