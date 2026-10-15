@@ -1,4 +1,3 @@
-```javascript
 "use strict";
 
 /* =====================================
@@ -881,4 +880,3 @@ window.addEventListener("pagehide", function () {
     plantsReloadTimer = null;
   }
 });
-```
