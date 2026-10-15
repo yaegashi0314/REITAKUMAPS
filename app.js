@@ -30,8 +30,6 @@ let hasCenteredOnLocation = false;
    Googleスプレッドシート設定
    ===================================== */
 
-// Apps ScriptをウェブアプリとしてデプロイしたURLを設定する
-// スプレッドシートのURLではないので注意！
 const PLANTS_API_URL =
   "https://script.google.com/a/macros/reitaku.jp/s/AKfycbyJubtkbo4ZmDn7S6spTA8VArect_dWqr5NAJDSwwPHIv5VAFBOAbjQ7MF83kZcL5w/exec";
 
@@ -115,10 +113,8 @@ function initializeMap() {
   map.on("load", function () {
     console.log("REITAKUMAPSの地図を読み込みました。");
 
-    // スプレッドシートから木のデータを取得
     loadPlantsFromSheet();
 
-    // 1分ごとに木のデータを再取得
     if (plantsReloadTimer !== null) {
       clearInterval(plantsReloadTimer);
     }
@@ -183,10 +179,8 @@ function changeMapMode(mode) {
       pitch: pitch
     });
 
-    // 地図の切り替え後に木のマーカーを再表示
     addPlantMarkers();
 
-    // 現在地マーカーも再表示
     if (currentLocation) {
       createOrMoveCurrentMarker(
         currentLocation.longitude,
@@ -256,7 +250,6 @@ function setupMapModeButtons() {
    Googleスプレッドシートから木のデータを取得
    ===================================== */
 
-// Apps Scriptから呼び出される関数
 window.receivePlantsData = function (data) {
   plantsLoading = false;
 
@@ -268,7 +261,6 @@ window.receivePlantsData = function (data) {
     return;
   }
 
-  // 緯度・経度が正しいデータだけを使用する
   plants = data.filter(function (plant) {
     const latitude = Number(
       plant.lat ?? plant.latitude
@@ -297,15 +289,11 @@ window.receivePlantsData = function (data) {
   );
 };
 
-// Apps ScriptのJSONPを読み込む
 function loadPlantsFromSheet() {
   if (plantsLoading) return;
 
-  if (
-    !PLANTS_API_URL ||
-    PLANTS_API_URL ===
-      "https://script.google.com/a/macros/reitaku.jp/s/AKfycbyJubtkbo4ZmDn7S6spTA8VArect_dWqr5NAJDSwwPHIv5VAFBOAbjQ7MF83kZcL5w/exec"
-  ) {
+  // 修正箇所：URLが空の場合だけ処理を止める
+  if (!PLANTS_API_URL) {
     console.warn(
       "PLANTS_API_URLにApps ScriptのウェブアプリURLを設定してください。"
     );
@@ -349,7 +337,6 @@ function loadPlantsFromSheet() {
 function addPlantMarkers() {
   if (!map || !Array.isArray(plants)) return;
 
-  // 古いマーカーを削除して重複を防止
   plantMarkers.forEach(function (marker) {
     marker.remove();
   });
@@ -635,7 +622,6 @@ function setupCompass() {
         return;
       }
 
-      // iOS Safariでは許可要求が必要な場合がある
       if (
         typeof DeviceOrientationEvent !== "undefined" &&
         typeof DeviceOrientationEvent.requestPermission ===
@@ -812,7 +798,6 @@ function setupInstallPrompt() {
     );
   }
 
-  // iPhoneのSafari向け案内
   const isIOS =
     /iphone|ipad|ipod/i.test(navigator.userAgent);
 
