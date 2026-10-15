@@ -33,7 +33,7 @@ let hasCenteredOnLocation = false;
 // Apps ScriptをウェブアプリとしてデプロイしたURLを設定する
 // スプレッドシートのURLではないので注意！
 const PLANTS_API_URL =
-  "ここにApps ScriptのウェブアプリURLを貼り付ける";
+  "https://script.google.com/a/macros/reitaku.jp/s/AKfycbyJubtkbo4ZmDn7S6spTA8VArect_dWqr5NAJDSwwPHIv5VAFBOAbjQ7MF83kZcL5w/exec";
 
 let plants = [];
 let plantMarkers = [];
