@@ -3,23 +3,40 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
 
   <title>REITAKUMAPS</title>
+
   <meta
     name="description"
     content="麗澤大学の木の位置を確認できるキャンパスマップ"
   >
+
   <meta name="theme-color" content="#6a00d4">
 
+  <!-- PWA設定 -->
   <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./icons/icon-192.png" type="image/png">
-  <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-  <!-- MapLibre -->
+  <!-- アイコン -->
   <link
-    href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css"
+    rel="icon"
+    href="./icons/icon-192.png"
+    type="image/png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="./icons/icon-192.png"
+  >
+
+  <!-- MapLibre CSS -->
+  <link
     rel="stylesheet"
+    href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css"
   >
 
   <!-- アプリのCSS -->
@@ -101,40 +118,47 @@
 
   <!-- iPhone向けインストール案内 -->
   <aside id="iosInstallHint" hidden>
-    iPhoneではSafariの共有メニューから
-    「ホーム画面に追加」を選択してください。
+    <strong>ホーム画面に追加する方法</strong>
+
+    <p>
+      Safariの共有メニューから
+      「ホーム画面に追加」を選択してください。
+    </p>
+
     <button id="closeIosHintButton" type="button">
       閉じる
     </button>
   </aside>
 
-  <!-- MapLibre本体 -->
+  <!-- MapLibre JavaScript -->
   <script src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"></script>
 
-  <!-- アプリの処理 -->
+  <!-- アプリ本体 -->
   <script src="./app.js"></script>
 
-  
-  <!-- PWAのService Worker -->
+  <!-- Service Worker登録 -->
   <script>
     if ("serviceWorker" in navigator) {
-      window.addEventListener("load", function () {
-        navigator.serviceWorker.register("./sw.js")
-          .then(function (registration) {
-            console.log(
-              "Service Worker登録成功:",
-              registration.scope
-            );
-          })
-          .catch(function (error) {
-            console.error(
-              "Service Workerの登録に失敗しました:",
-              error
-            );
-          });
+      window.addEventListener("load", async function () {
+        try {
+          const registration =
+            await navigator.serviceWorker.register("./sw.js");
+
+          console.log(
+            "Service Worker登録成功:",
+            registration.scope
+          );
+
+          // 新しいバージョンを確認
+          await registration.update();
+        } catch (error) {
+          console.error(
+            "Service Workerの登録に失敗しました:",
+            error
+          );
+        }
       });
     }
   </script>
-
 </body>
 </html>
