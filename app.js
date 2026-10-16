@@ -1,3 +1,4 @@
+
 "use strict";
 
 /* =====================================
@@ -26,17 +27,18 @@ let deferredInstallPrompt = null;
 let locationWatchId = null;
 let hasCenteredOnLocation = false;
 
+let plants = [];
+let plantMarkers = [];
+let plantsReloadTimer = null;
+let plantsLoading = false;
+let plantsRequestTimer = null;
+
 /* =====================================
    Googleスプレッドシート設定
    ===================================== */
 
 const PLANTS_API_URL =
   "https://script.google.com/a/macros/reitaku.jp/s/AKfycbyJubtkbo4ZmDn7S6spTA8VArect_dWqr5NAJDSwwPHIv5VAFBOAbjQ7MF83kZcL5w/exec";
-
-let plants = [];
-let plantMarkers = [];
-let plantsReloadTimer = null;
-let plantsLoading = false;
 
 /* =====================================
    地図スタイル
@@ -119,16 +121,22 @@ function initializeMap() {
       clearInterval(plantsReloadTimer);
     }
 
-    plantsReloadTimer = setInterval(
-      loadPlantsFromSheet,
-      60000
-    );
+    plantsReloadTimer = setInterval(function () {
+      loadPlantsFromSheet();
+    }, 60000);
 
     addCurrentLocationControl();
     startLocationTracking();
     updateMapModeButtons();
 
     map.resize();
+
+    // スマートフォンで地図の表示サイズが確定した後に再調整
+    requestAnimationFrame(function () {
+      if (map) {
+        map.resize();
+      }
+    });
   });
 
   map.on("error", function (event) {
@@ -189,6 +197,7 @@ function changeMapMode(mode) {
     }
 
     map.resize();
+    updateArrowRotation();
   });
 
   updateMapModeButtons();
@@ -247,10 +256,11 @@ function setupMapModeButtons() {
 }
 
 /* =====================================
-   Googleスプレッドシートから木のデータを取得
+   植物データの読み込み
    ===================================== */
 
 window.receivePlantsData = function (data) {
+  clearPlantsRequestTimer();
   plantsLoading = false;
 
   if (!Array.isArray(data)) {
@@ -261,7 +271,11 @@ window.receivePlantsData = function (data) {
     return;
   }
 
-  plants = data.filter(function (plant) {
+  const validPlants = data.filter(function (plant) {
+    if (!plant || typeof plant !== "object") {
+      return false;
+    }
+
     const latitude = Number(
       plant.lat ?? plant.latitude
     );
@@ -280,6 +294,8 @@ window.receivePlantsData = function (data) {
     );
   });
 
+  plants = validPlants;
+
   addPlantMarkers();
 
   console.log(
@@ -289,13 +305,19 @@ window.receivePlantsData = function (data) {
   );
 };
 
+function clearPlantsRequestTimer() {
+  if (plantsRequestTimer !== null) {
+    clearTimeout(plantsRequestTimer);
+    plantsRequestTimer = null;
+  }
+}
+
 function loadPlantsFromSheet() {
   if (plantsLoading) return;
 
-  // 修正箇所：URLが空の場合だけ処理を止める
   if (!PLANTS_API_URL) {
     console.warn(
-      "PLANTS_API_URLにApps ScriptのウェブアプリURLを設定してください。"
+      "PLANTS_API_URLにApps ScriptのURLを設定してください。"
     );
     return;
   }
@@ -304,27 +326,55 @@ function loadPlantsFromSheet() {
 
   const script = document.createElement("script");
 
+  const separator =
+    PLANTS_API_URL.includes("?") ? "&" : "?";
+
   script.src =
     PLANTS_API_URL +
-    (PLANTS_API_URL.includes("?") ? "&" : "?") +
+    separator +
     "callback=receivePlantsData&_=" +
     Date.now();
 
   script.async = true;
 
-  script.onerror = function () {
+  // 応答がない場合に、読み込み状態が残り続けないようにする
+  plantsRequestTimer = setTimeout(function () {
     plantsLoading = false;
+    plantsRequestTimer = null;
+
+    script.onerror = null;
+    script.onload = null;
+    script.remove();
 
     console.error(
-      "木データを取得できませんでした。URL、デプロイ設定、シート名を確認してください。"
+      "木データの取得がタイムアウトしました。Apps Scriptの公開設定と応答を確認してください。"
     );
+  }, 15000);
 
+  script.onerror = function () {
+    clearPlantsRequestTimer();
+    plantsLoading = false;
     script.remove();
+
+    console.error(
+      "木データを取得できませんでした。URL、公開設定、シート名を確認してください。"
+    );
   };
 
   script.onload = function () {
-    script.remove();
-    plantsLoading = false;
+    // JSONPのコールバックが実行されなかった場合も解除する
+    setTimeout(function () {
+      if (plantsLoading) {
+        clearPlantsRequestTimer();
+        plantsLoading = false;
+
+        console.error(
+          "木データの応答は届きましたが、データ処理が完了していません。Apps Scriptの返却形式を確認してください。"
+        );
+      }
+
+      script.remove();
+    }, 1000);
   };
 
   document.head.appendChild(script);
@@ -337,6 +387,7 @@ function loadPlantsFromSheet() {
 function addPlantMarkers() {
   if (!map || !Array.isArray(plants)) return;
 
+  // 既存のマーカーを削除してから作り直す
   plantMarkers.forEach(function (marker) {
     marker.remove();
   });
@@ -373,10 +424,7 @@ function addPlantMarkers() {
       document.createElement("div");
 
     markerElement.className = "plant-marker";
-    markerElement.setAttribute(
-      "aria-label",
-      plantName
-    );
+    markerElement.setAttribute("aria-label", plantName);
     markerElement.setAttribute("role", "button");
     markerElement.setAttribute("tabindex", "0");
     markerElement.title = plantName;
@@ -386,7 +434,6 @@ function addPlantMarkers() {
 
     const title = document.createElement("strong");
     title.textContent = plantName;
-
     popupContent.appendChild(title);
 
     const descriptionText =
@@ -415,6 +462,14 @@ function addPlantMarkers() {
       )
       .addTo(map);
 
+    // キーボードでもポップアップを開けるようにする
+    markerElement.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        marker.togglePopup();
+      }
+    });
+
     plantMarkers.push(marker);
   });
 }
@@ -438,12 +493,10 @@ function addCurrentLocationControl() {
   locationButton.type = "button";
   locationButton.textContent = "◎";
   locationButton.title = "現在地を表示";
-
   locationButton.setAttribute(
     "aria-label",
     "現在地を表示"
   );
-
   locationButton.style.fontSize = "24px";
 
   locationButton.addEventListener("click", function () {
@@ -507,6 +560,10 @@ function startLocationTracking() {
     return;
   }
 
+  if (locationWatchId !== null) {
+    navigator.geolocation.clearWatch(locationWatchId);
+  }
+
   locationWatchId =
     navigator.geolocation.watchPosition(
       updateCurrentLocation,
@@ -561,19 +618,34 @@ function createOrMoveCurrentMarker(
   if (!map) return;
 
   if (!currentMarker) {
-    currentArrowElement =
+    // MapLibreが位置調整に使う外側の要素
+    const markerContainer =
       document.createElement("div");
 
-    currentArrowElement.className =
+    markerContainer.className =
       "current-location-marker";
 
-    currentArrowElement.setAttribute(
+    markerContainer.setAttribute(
       "aria-label",
       "現在地"
     );
 
+    // 回転は内側の要素だけに適用する
+    currentArrowElement =
+      document.createElement("div");
+
+    currentArrowElement.className =
+      "current-location-arrow";
+
+    currentArrowElement.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    markerContainer.appendChild(currentArrowElement);
+
     currentMarker = new maplibregl.Marker({
-      element: currentArrowElement,
+      element: markerContainer,
       anchor: "center"
     })
       .setLngLat([longitude, latitude])
@@ -699,6 +771,8 @@ function disableCompass() {
       "false"
     );
   }
+
+  updateArrowRotation();
 }
 
 function handleDeviceOrientation(event) {
@@ -706,11 +780,16 @@ function handleDeviceOrientation(event) {
 
   let heading = null;
 
+  // iPhone Safariが返す方位を優先する
   if (
-    typeof event.webkitCompassHeading === "number"
+    typeof event.webkitCompassHeading === "number" &&
+    Number.isFinite(event.webkitCompassHeading)
   ) {
     heading = event.webkitCompassHeading;
-  } else if (typeof event.alpha === "number") {
+  } else if (
+    typeof event.alpha === "number" &&
+    Number.isFinite(event.alpha)
+  ) {
     heading = 360 - event.alpha;
   }
 
@@ -864,4 +943,7 @@ window.addEventListener("pagehide", function () {
     clearInterval(plantsReloadTimer);
     plantsReloadTimer = null;
   }
+
+  clearPlantsRequestTimer();
+  plantsLoading = false;
 });
