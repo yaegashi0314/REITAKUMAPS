@@ -1,4 +1,3 @@
-
 "use strict";
 
 /* =====================================
@@ -424,6 +423,7 @@ function addPlantMarkers() {
       plant.category ||
       "木";
 
+    // 外側の要素：MapLibreが位置決めに使う
     const markerElement =
       document.createElement("div");
 
@@ -432,6 +432,11 @@ function addPlantMarkers() {
     markerElement.setAttribute("role", "button");
     markerElement.setAttribute("tabindex", "0");
     markerElement.title = plantName;
+
+    // 内側の要素：見た目（丸いドット）と hover 拡大用
+    const dot = document.createElement("div");
+    dot.className = "plant-marker-dot";
+    markerElement.appendChild(dot);
 
     const popupContent =
       document.createElement("div");

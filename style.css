@@ -1,4 +1,3 @@
-
 /* ==============================
    基本設定
 ============================== */
@@ -187,22 +186,34 @@ body {
 
 /* ==============================
    木のマーカー
+   外側の要素はMapLibreが
+   position: absolute と transform で
+   位置を決めるので、position や transform を
+   指定しない。見た目は内側のドットに付ける。
 ============================== */
 
 .plant-marker {
-  position: relative;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.plant-marker-dot {
   width: 14px;
   height: 14px;
   border: 2px solid #fff;
   border-radius: 50%;
   background: #22a447;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  transition: transform 0.1s;
 }
 
-.plant-marker:hover {
+.plant-marker:hover .plant-marker-dot {
   transform: scale(1.2);
 }
 
@@ -240,10 +251,10 @@ body {
 /* ==============================
    現在地マーカー
    外側はMapLibreが位置を調整する
+   (position は指定しない)
 ============================== */
 
 .current-location-marker {
-  position: relative;
   width: 38px;
   height: 38px;
   display: flex;
