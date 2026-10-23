@@ -39,6 +39,10 @@ let plantsRequestTimer = null;
 const PLANTS_API_URL =
   "https://script.google.com/a/macros/reitaku.jp/s/AKfycbyJubtkbo4ZmDn7S6spTA8VArect_dWqr5NAJDSwwPHIv5VAFBOAbjQ7MF83kZcL5w/exec";
 
+// スプレッドシートから取得できなかったときに使う予備のデータ
+// （index.html と同じ場所に plants.json を置く）
+const PLANTS_JSON_URL = "./plants.json";
+
 /* =====================================
    地図スタイル
    ===================================== */
@@ -263,9 +267,20 @@ window.receivePlantsData = function (data) {
   clearPlantsRequestTimer();
   plantsLoading = false;
 
+  // スプレッドシートのデータが使えなければ、予備のJSONに切り替える
+  if (!applyPlantsData(data, "スプレッドシート")) {
+    loadPlantsFromJson();
+  }
+};
+
+// データを検証して地図に反映する。使えたら true、使えなければ false
+function applyPlantsData(data, sourceName) {
   if (!Array.isArray(data)) {
-    console.error("木データの形式が正しくありません。", data);
-    return;
+    console.error(
+      "木データの形式が正しくありません。(" + sourceName + ")",
+      data
+    );
+    return false;
   }
 
   const validPlants = data.filter(function (plant) {
@@ -288,13 +303,21 @@ window.receivePlantsData = function (data) {
     );
   });
 
-  // 以前読み込んだ植物データがあるのに、
-  // 今回の応答が空だった場合は既存データを維持する
-  if (validPlants.length === 0 && plants.length > 0) {
+  if (validPlants.length === 0) {
+    // 以前読み込んだ植物データがあるのに、
+    // 今回の応答が空だった場合は既存データを維持する
+    if (plants.length > 0) {
+      console.warn(
+        "植物データが0件だったため、以前のデータを維持します。"
+      );
+      return true;
+    }
+
+    // まだ何も読み込めていないなら、使えないデータとして扱う
     console.warn(
-      "植物データが0件だったため、以前のデータを維持します。"
+      "植物データが0件でした。(" + sourceName + ")"
     );
-    return;
+    return false;
   }
 
   plants = validPlants;
@@ -303,9 +326,38 @@ window.receivePlantsData = function (data) {
   console.log(
     "木データを読み込みました:",
     plants.length,
-    "件"
+    "件",
+    "(" + sourceName + ")"
   );
-};
+
+  return true;
+}
+
+// 予備の plants.json を読み込む
+// すでに植物データがある場合は何もしない（古いデータで上書きしない）
+function loadPlantsFromJson() {
+  if (plants.length > 0) return;
+
+  fetch(PLANTS_JSON_URL + "?_=" + Date.now(), {
+    cache: "no-store"
+  })
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+
+      return response.json();
+    })
+    .then(function (data) {
+      applyPlantsData(data, "plants.json");
+    })
+    .catch(function (error) {
+      console.error(
+        "予備の plants.json も読み込めませんでした。",
+        error
+      );
+    });
+}
 
 
 function clearPlantsRequestTimer() {
@@ -352,6 +404,8 @@ function loadPlantsFromSheet() {
     console.error(
       "木データの取得がタイムアウトしました。Apps Scriptの公開設定と応答を確認してください。"
     );
+
+    loadPlantsFromJson();
   }, 15000);
 
   script.onerror = function () {
@@ -362,6 +416,8 @@ function loadPlantsFromSheet() {
     console.error(
       "木データを取得できませんでした。URL、公開設定、シート名を確認してください。"
     );
+
+    loadPlantsFromJson();
   };
 
   script.onload = function () {
@@ -374,6 +430,8 @@ function loadPlantsFromSheet() {
         console.error(
           "木データの応答は届きましたが、データ処理が完了していません。Apps Scriptの返却形式を確認してください。"
         );
+
+        loadPlantsFromJson();
       }
 
       script.remove();
