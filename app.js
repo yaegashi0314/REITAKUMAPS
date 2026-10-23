@@ -259,15 +259,13 @@ function setupMapModeButtons() {
    植物データの読み込み
    ===================================== */
 
+
 window.receivePlantsData = function (data) {
   clearPlantsRequestTimer();
   plantsLoading = false;
 
   if (!Array.isArray(data)) {
-    console.error(
-      "木データの形式が正しくありません。",
-      data
-    );
+    console.error("木データの形式が正しくありません。", data);
     return;
   }
 
@@ -276,10 +274,7 @@ window.receivePlantsData = function (data) {
       return false;
     }
 
-    const latitude = Number(
-      plant.lat ?? plant.latitude
-    );
-
+    const latitude = Number(plant.lat ?? plant.latitude);
     const longitude = Number(
       plant.lng ?? plant.lon ?? plant.longitude
     );
@@ -294,8 +289,16 @@ window.receivePlantsData = function (data) {
     );
   });
 
-  plants = validPlants;
+  // 以前読み込んだ植物データがあるのに、
+  // 今回の応答が空だった場合は既存データを維持する
+  if (validPlants.length === 0 && plants.length > 0) {
+    console.warn(
+      "植物データが0件だったため、以前のデータを維持します。"
+    );
+    return;
+  }
 
+  plants = validPlants;
   addPlantMarkers();
 
   console.log(
@@ -304,6 +307,7 @@ window.receivePlantsData = function (data) {
     "件"
   );
 };
+
 
 function clearPlantsRequestTimer() {
   if (plantsRequestTimer !== null) {

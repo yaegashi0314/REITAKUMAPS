@@ -6,7 +6,7 @@
 ======================================== */
 
 // 更新時にバージョン番号を変更する
-const CACHE_NAME = "reitakumaps-v6";
+const CACHE_NAME = "reitakumaps-v7";
 
 // アプリの基本ファイル
 const APP_SHELL = [
